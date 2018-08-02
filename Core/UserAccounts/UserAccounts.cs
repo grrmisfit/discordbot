@@ -15,7 +15,7 @@ namespace discordbot.Core.UserAccounts
         
 
         public static List<GetPlayerOnlineResult> accounts;
-        public static List<GetPlayerOnlineResult> curaccounts;
+        public static List<GetPlayerOnlineResult> curplayers;
         public static string accountsFile = "players.json";
             static UserAccounts()
              {
@@ -35,12 +35,12 @@ namespace discordbot.Core.UserAccounts
             DataStorage.SaveUserAccounts(accounts, accountsFile);
         }
 
-        public static GetPlayerOnlineResult GetAccount(string thaplayer)
+     /*   public static GetPlayerOnlineResult GetAccount(string thaplayer)
     {
             return GetOrCreateAccount(thaplayer);
     }
 
-        private static GetPlayerOnlineResult GetOrCreateAccount(string id)
+      /*  private static GetPlayerOnlineResult GetOrCreateAccount(string id)
         {
             var result = from a in accounts
                          
@@ -55,33 +55,13 @@ namespace discordbot.Core.UserAccounts
 
             return account;
         }
-
-       /* public static GetPlayerOnlineResult CheckForNewPlayers(string id)
-        {
-            var result = from a in accounts
-                         where a.Steamid == id
-                         select a;
-            var theid = result.FirstOrDefault();
-            var newid = new GetPlayerOnlineResult();
-
-            for (int i = 0; i <newid.Count; i++)
-            {
-                if (curaccounts[i].Steamid == id) CreateUserAccount(curaccounts[i].Steamid, curaccounts[i].Name, curaccounts[i].Experience, curaccounts[i].Playerkills, curaccounts[i].Playerdeaths, curaccounts[i].Online);
-
-
-            }
-           // if (theid == null) CreateUserAccount(id);//theid = CreateUserAccount(newid.Steamid, newid.Name, newid.Experience, theid.Playerkills, theid.Playerdeaths, theid.Online);
-            
-                 return theid;
-               
-        }
         */
-        public static GetPlayerOnlineResult CreateUserAccount(string id, string name, int xp, int kills, int deaths, bool on)
+        public static UserAccount CreateUserAccount(string id, string name, int xp, int kills, int deaths, bool on)
         {
 
 
 
-            var newAccount = new GetPlayerOnlineResult()
+            var newAccount = new UserAccount()
             {
                 Steamid = id,
                 Name = name,
@@ -90,12 +70,31 @@ namespace discordbot.Core.UserAccounts
                 Playerdeaths = deaths,
                 Online = on,
             };
-          
+
             accounts.Add(newAccount);
             SaveAccounts();
             return newAccount;
 
         }
+
+        public static void CheckForNewPlayers(string id)
+        {
+            var result = from a in accounts
+                         where a.Steamid == id
+                         select a;
+            var account = result.FirstOrDefault();
+           
+            if (account == null)
+
+                for (int i = 0; i <curplayers.Count; i++)
+                    if (id == curplayers[i].Steamid)
+                    {
+                        account = CreateUserAccount(curplayers[i].Steamid, curplayers[i].Name, curplayers[i].Experience, curplayers[i].Playerkills, curplayers[i].Playerdeaths, curplayers[i].Online);
+                    }
+
+
+        }
+            
+          }
         
-    }
-}
+        }
