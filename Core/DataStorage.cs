@@ -24,7 +24,17 @@ namespace discordbot.Core
             string json = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<List<GetPlayerOnlineResult>>(json);
         }
-
+        public static IEnumerable<GetPlayerOnlineResult> LoadSavedAccounts(string filePath)
+        {
+            if (!File.Exists(filePath)) return null;
+            string json = File.ReadAllText(filePath);
+            return JsonConvert.DeserializeObject<List<GetPlayerOnlineResult>>(json);
+        }
+        public static void SaveTmpAccounts(IEnumerable<GetPlayerOnlineResult> accounts, string filePath)
+        {
+            string json = JsonConvert.SerializeObject(accounts, Formatting.Indented);
+            File.WriteAllText(filePath, json);
+        }
         public static bool SaveExists(string filePath)
         {
             return File.Exists(filePath);

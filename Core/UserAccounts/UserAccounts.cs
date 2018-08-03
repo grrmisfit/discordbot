@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using discordbot.Modules;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,15 @@ namespace discordbot.Core.UserAccounts
 
         public static List<GetPlayerOnlineResult> accounts;
         public static List<GetPlayerOnlineResult> curonline;
-        public static string curplayers = "";
+
         public static string accountsFile = "players.json";
             static UserAccounts()
              {
                 if(DataStorage.SaveExists(accountsFile))
             {
+               
                 accounts = DataStorage.LoadUserAccounts(accountsFile).ToList();
-                
+               
             }
                 else
             {
@@ -87,12 +89,9 @@ namespace discordbot.Core.UserAccounts
             // var account = result.FirstOrDefault();
 
             // if (account == null)
-            JObject a = JObject.Parse(curplayers);
-            for (int i = 0; i <curonline.Count; i++)
-                if (a.ContainsKey(id) == true) 
-                    {
-                         CreateUserAccount(curonline[i].Steamid, curonline[i].Name, curonline[i].Experience, curonline[i].Playerkills, curonline[i].Playerdeaths, curonline[i].Online);
-                    }
+
+            //JArray a = JArray.Parse(accounts);
+            
 
     
         }
