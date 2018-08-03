@@ -10,7 +10,8 @@ namespace discordbot.Core
 {
     public static class DataStorage
     {
-
+        
+      
         // Save all userAccounts
         public static void SaveUserAccounts(IEnumerable<GetPlayerOnlineResult> accounts, string filePath)
         {

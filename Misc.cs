@@ -11,11 +11,14 @@ using System.Net;
 using Discord.Rest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using discordbot.Core;
+using System.IO;
 
 namespace discordbot.Modules
 {
     public class Misc : ModuleBase<SocketCommandContext>
     {
+        
         public async Task SendMessage(string msg)
             {
            await Context.Channel.SendMessageAsync( msg);
@@ -42,36 +45,43 @@ namespace discordbot.Modules
         public async Task GetPlayersList([Remainder]string message)
         {
             string json = "";
-            using (WebClient client = new WebClient())
+            if (!File.Exists("players.json"))
             {
-                 json = client.DownloadString("http://45.58.114.154:26916/api/getplayersonline?adminuser=csmm2&admintoken=da3rd");
+              await  SendMessage("Player File not found!");
+                return;
             }
+             json = File.ReadAllText("players.json");
+           
             if (json == "") return;
             if (json == "[]") await SendMessage("No one is online atm, try again later");
-           // var apiResponse = JsonConvert.DeserializeObject<apiResponse>(json);
+           
             JArray a = JArray.Parse(json);
-            var onlinePlayers = a.ToObject<List<GetPlayerOnlineResult>>();
-            
-            foreach(GetPlayerOnlineResult player in onlinePlayers)
+            List<GetPlayerOnlineResult> tmpdata = new List<GetPlayerOnlineResult>();
+            var tempdata = a.ToObject<List<GetPlayerOnlineResult>>();
+            var namefound = false;
+            foreach (GetPlayerOnlineResult player in tempdata)
             {
                 if(player.Name == message)
                 {
+                    namefound = true;
                     var embed = new EmbedBuilder();
                     embed.WithTitle("Player Information");
                     embed.WithDescription(message);
                     embed.AddField("Level", Math.Floor(player.Level),true);
                     embed.AddField("Kills", player.Zombiekills, true);
                     embed.AddField("Deaths", player.Playerdeaths, true);
-                    //embed.AddField("Location", player.Position, true);
+                    embed.AddField("Online", player.Lastonline, true);
                     embed.WithColor(new Color(0, 255, 0));
 
                     await Context.Channel.SendMessageAsync("", false, embed.Build());
-
+                    break;
                 }
-            }
-            //string steamid =  a.players[0].steamid.ToString();
-            
-
+                
+                  }
+           
+            if (namefound == false) await  SendMessage("Player hasnt been seen yet, try again later!");
+             
+                    
 
         }
 
@@ -87,25 +97,7 @@ namespace discordbot.Modules
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
-        [Command("getporn")]
-        public async Task PickOne([Remainder]string message)
-        {
-
-            string[] options = message.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            Random r = new Random();
-            string selection = options[r.Next(0, options.Length)];
-
-
-
-            var embed = new EmbedBuilder();
-            embed.WithTitle("Choice for " + Context.User.Username);
-            embed.WithDescription(message);
-            embed.WithColor(new Color(0, 255, 0));
-            embed.WithThumbnailUrl("https://i.kinja-img.com/gawker-media/image/upload/s--HApVmIBh--/c_scale,f_auto,fl_progressive,q_80,w_800/zigjxvw4cg3xbabifaet.png");
-
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
-        }
+       
 
         [Command("secret")]
 
@@ -155,16 +147,7 @@ namespace discordbot.Modules
          //   await Context.Channel.SendMessageAsync($"{target.Username} has {account.XP} XP and {account.Points} points");
        // }
 
-      /*  [Command("addxp")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task AddXp(uint xp)
-        {
-            var account = UserAccounts.GetAccount(Context.User);
-            account.XP += xp;
-            UserAccounts.SaveAccounts();
-            await Context.Channel.SendMessageAsync($"You gained {xp} XP.");
-        }
-        */
+     
        
        [Command("react")]
        public async Task HandleReactionMessage()
