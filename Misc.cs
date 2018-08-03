@@ -70,7 +70,7 @@ namespace discordbot.Modules
                     embed.AddField("Level", Math.Floor(player.Level),true);
                     embed.AddField("Kills", player.Zombiekills, true);
                     embed.AddField("Deaths", player.Playerdeaths, true);
-                    embed.AddField("Online", player.Lastonline, true);
+                    embed.AddField("Last Online on", player.Lastonline, true);
                     embed.WithColor(new Color(0, 255, 0));
 
                     await Context.Channel.SendMessageAsync("", false, embed.Build());
