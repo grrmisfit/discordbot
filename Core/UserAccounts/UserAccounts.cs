@@ -15,13 +15,15 @@ namespace discordbot.Core.UserAccounts
         
 
         public static List<GetPlayerOnlineResult> accounts;
-        public static List<GetPlayerOnlineResult> curplayers;
+        public static List<GetPlayerOnlineResult> curonline;
+        public static string curplayers = "";
         public static string accountsFile = "players.json";
             static UserAccounts()
              {
                 if(DataStorage.SaveExists(accountsFile))
             {
                 accounts = DataStorage.LoadUserAccounts(accountsFile).ToList();
+                
             }
                 else
             {
@@ -56,12 +58,12 @@ namespace discordbot.Core.UserAccounts
             return account;
         }
         */
-        public static UserAccount CreateUserAccount(string id, string name, int xp, int kills, int deaths, bool on)
+        public static GetPlayerOnlineResult CreateUserAccount(string id, string name, int xp, int kills, int deaths, bool on)
         {
 
 
 
-            var newAccount = new UserAccount()
+            var newAccount = new GetPlayerOnlineResult()
             {
                 Steamid = id,
                 Name = name,
@@ -79,20 +81,20 @@ namespace discordbot.Core.UserAccounts
 
         public static void CheckForNewPlayers(string id)
         {
-            var result = from a in accounts
-                         where a.Steamid == id
-                         select a;
-            var account = result.FirstOrDefault();
-           
-            if (account == null)
+            //var result = from a in accounts
+            //              where a.Steamid == id
+            //              select a;
+            // var account = result.FirstOrDefault();
 
-                for (int i = 0; i <curplayers.Count; i++)
-                    if (id == curplayers[i].Steamid)
+            // if (account == null)
+            JObject a = JObject.Parse(curplayers);
+            for (int i = 0; i <curonline.Count; i++)
+                if (a.ContainsKey(id) == true) 
                     {
-                        account = CreateUserAccount(curplayers[i].Steamid, curplayers[i].Name, curplayers[i].Experience, curplayers[i].Playerkills, curplayers[i].Playerdeaths, curplayers[i].Online);
+                         CreateUserAccount(curonline[i].Steamid, curonline[i].Name, curonline[i].Experience, curonline[i].Playerkills, curonline[i].Playerdeaths, curonline[i].Online);
                     }
 
-
+    
         }
             
           }

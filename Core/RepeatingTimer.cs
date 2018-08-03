@@ -49,6 +49,7 @@ namespace discordbot.Core
 
             foreach (GetPlayerOnlineResult player in onlinePlayers)
             {
+                
                 UserAccounts.UserAccounts.CheckForNewPlayers(player.Steamid);
             }
 
