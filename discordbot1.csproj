@@ -144,11 +144,13 @@
     <Compile Include="DataStorage.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Misc.cs" />
-    <Compile Include="Modules\Warframe.cs" />
+    <Compile Include="Modules\Warframe\Warframe.cs" />
+    <Compile Include="Modules\Warframe\Sorties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Modules\Warframe\sorties.json" />
     <None Include="packages.config" />
     <None Include="SystemLang\alerts.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

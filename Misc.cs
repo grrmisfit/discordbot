@@ -10,6 +10,7 @@ using discordbot.Core.UserAccounts;
 using System.Net;
 using Discord.Rest;
 using Newtonsoft.Json;
+using discordbot.Modules.Warframe;
 using Newtonsoft.Json.Linq;
 using discordbot.Core;
 using System.IO;
@@ -140,19 +141,21 @@ namespace discordbot.Modules
 
             // Warframe warframe = JsonConvert.DeserializeObject<Warframe>(apiresponse);
            // using Warframe;
-            var warframe = Warframe.FromJson(apiresponse);
+            var warframe = Warframe.Warframe.FromJson(apiresponse);
             var seed = warframe.WorldSeed;
             var activeMissions = warframe.ActiveMissions; //this is a List<ActiveMission> 
+            var theSorties = warframe.Sorties;
             int dacount = 0;
             foreach (ActiveMission am in activeMissions)
                
             {
                 string type = activeMissions[dacount].MissionType;
+                string bossname = theSorties[0].Boss;
                 Date activationDate = am.Activation.Date;
                 //Console.WriteLine(Utilities.GetMissions(type)); //+ " " + activeMissions[3].Node + " " + activeMissions[3].Region);
                
 
-                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node + " " + activeMissions[dacount].Region);
+                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node + " " + Utilities.GetSorties(bossname));
                 dacount = dacount + 1;
                
             }

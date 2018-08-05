@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-namespace discordbot.Modules
+namespace discordbot.Modules.Warframe
 {
     public partial class Warframe
     {
@@ -190,17 +190,17 @@ namespace discordbot.Modules
         [JsonProperty("seed")]
         public long Seed { get; set; }
 
+        [JsonProperty("maxWaveNum", NullValueHandling = NullValueHandling.Ignore)]
+        public long? MaxWaveNum { get; set; }
+
         [JsonProperty("missionReward")]
         public MissionReward MissionReward { get; set; }
 
-        [JsonProperty("customAdvancedSpawners", NullValueHandling = NullValueHandling.Ignore)]
-        public List<string> CustomAdvancedSpawners { get; set; }
+        [JsonProperty("nightmare", NullValueHandling = NullValueHandling.Ignore)]
+        public bool? Nightmare { get; set; }
 
-        [JsonProperty("archwingRequired", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? ArchwingRequired { get; set; }
-
-        [JsonProperty("isSharkwingMission", NullValueHandling = NullValueHandling.Ignore)]
-        public bool? IsSharkwingMission { get; set; }
+        [JsonProperty("extraEnemySpec", NullValueHandling = NullValueHandling.Ignore)]
+        public string ExtraEnemySpec { get; set; }
     }
 
     public partial class MissionReward
@@ -208,17 +208,8 @@ namespace discordbot.Modules
         [JsonProperty("credits")]
         public long Credits { get; set; }
 
-        [JsonProperty("countedItems", NullValueHandling = NullValueHandling.Ignore)]
-        public List<CountedItem> CountedItems { get; set; }
-    }
-
-    public partial class CountedItem
-    {
-        [JsonProperty("ItemType")]
-        public string ItemType { get; set; }
-
-        [JsonProperty("ItemCount")]
-        public long ItemCount { get; set; }
+        [JsonProperty("items", NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> Items { get; set; }
     }
 
     public partial class BadlandNode
@@ -371,7 +362,7 @@ namespace discordbot.Modules
         public long Goal { get; set; }
 
         [JsonProperty("LocTag")]
-        public LocTag LocTag { get; set; }
+        public string LocTag { get; set; }
 
         [JsonProperty("Completed")]
         public bool Completed { get; set; }
@@ -405,6 +396,15 @@ namespace discordbot.Modules
     {
         [JsonProperty("countedItems")]
         public List<CountedItem> CountedItems { get; set; }
+    }
+
+    public partial class CountedItem
+    {
+        [JsonProperty("ItemType")]
+        public string ItemType { get; set; }
+
+        [JsonProperty("ItemCount")]
+        public long ItemCount { get; set; }
     }
 
     public partial class DefenderMissionInfo
@@ -595,9 +595,7 @@ namespace discordbot.Modules
 
     public enum AttackerMissionInfoFaction { FcCorpus, FcGrineer };
 
-    public enum FactionEnum { FcCorpus, FcInfestation };
-
-    public enum LocTag { LotusLanguageMenuCorpusInvasionGeneric, LotusLanguageMenuInfestedInvasionBoss, LotusLanguageMenuInfestedInvasionGeneric };
+    public enum FactionEnum { FcCorpus, FcGrineer, FcInfestation };
 
     public enum Category { PvpChallengeTypeCategoryDaily, PvpChallengeTypeCategoryWeekly, PvpChallengeTypeCategoryWeeklyRoot };
 
@@ -613,7 +611,7 @@ namespace discordbot.Modules
         public bool IsNull => AnythingArray == null && ErReward == null;
     }
 
-   public partial class Warframe
+    public partial class Warframe
     {
         public static Warframe FromJson(string json) => JsonConvert.DeserializeObject<Warframe>(json, Converter.Settings);
     }
@@ -633,7 +631,6 @@ namespace discordbot.Modules
                 AttackerMissionInfoFactionConverter.Singleton,
                 AttackerRewardConverter.Singleton,
                 FactionEnumConverter.Singleton,
-                LocTagConverter.Singleton,
                 CategoryConverter.Singleton,
                 NConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
@@ -731,6 +728,8 @@ namespace discordbot.Modules
             {
                 case "FC_CORPUS":
                     return FactionEnum.FcCorpus;
+                case "FC_GRINEER":
+                    return FactionEnum.FcGrineer;
                 case "FC_INFESTATION":
                     return FactionEnum.FcInfestation;
             }
@@ -750,6 +749,9 @@ namespace discordbot.Modules
                 case FactionEnum.FcCorpus:
                     serializer.Serialize(writer, "FC_CORPUS");
                     return;
+                case FactionEnum.FcGrineer:
+                    serializer.Serialize(writer, "FC_GRINEER");
+                    return;
                 case FactionEnum.FcInfestation:
                     serializer.Serialize(writer, "FC_INFESTATION");
                     return;
@@ -758,52 +760,6 @@ namespace discordbot.Modules
         }
 
         public static readonly FactionEnumConverter Singleton = new FactionEnumConverter();
-    }
-
-    internal class LocTagConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(LocTag) || t == typeof(LocTag?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "/Lotus/Language/Menu/CorpusInvasionGeneric":
-                    return LocTag.LotusLanguageMenuCorpusInvasionGeneric;
-                case "/Lotus/Language/Menu/InfestedInvasionBoss":
-                    return LocTag.LotusLanguageMenuInfestedInvasionBoss;
-                case "/Lotus/Language/Menu/InfestedInvasionGeneric":
-                    return LocTag.LotusLanguageMenuInfestedInvasionGeneric;
-            }
-            throw new Exception("Cannot unmarshal type LocTag");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (LocTag)untypedValue;
-            switch (value)
-            {
-                case LocTag.LotusLanguageMenuCorpusInvasionGeneric:
-                    serializer.Serialize(writer, "/Lotus/Language/Menu/CorpusInvasionGeneric");
-                    return;
-                case LocTag.LotusLanguageMenuInfestedInvasionBoss:
-                    serializer.Serialize(writer, "/Lotus/Language/Menu/InfestedInvasionBoss");
-                    return;
-                case LocTag.LotusLanguageMenuInfestedInvasionGeneric:
-                    serializer.Serialize(writer, "/Lotus/Language/Menu/InfestedInvasionGeneric");
-                    return;
-            }
-            throw new Exception("Cannot marshal type LocTag");
-        }
-
-        public static readonly LocTagConverter Singleton = new LocTagConverter();
     }
 
     internal class CategoryConverter : JsonConverter
@@ -886,3 +842,5 @@ namespace discordbot.Modules
         public static readonly NConverter Singleton = new NConverter();
     }
 }
+
+
