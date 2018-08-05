@@ -40,7 +40,7 @@ namespace discordbot.Modules
             await user.Guild.AddBanAsync(user, 5, reason);
             
         }
-
+        
         [Command("player")]
         public async Task GetPlayersList([Remainder]string message)
         {
@@ -127,7 +127,36 @@ namespace discordbot.Modules
             await Context.Channel.SendMessageAsync("Data has " + DataStorage.GetPairsCount() + " pairs.");
             DataStorage.AddPairToStorage("Count" + DataStorage.GetPairsCount(), "TheCount" + DataStorage.GetPairsCount());
         }
+        [Command("missions")]
+        public async Task GetMissions()
+        {
+            string url = "http://content.warframe.com/dynamic/worldState.php";
+            string apiresponse = "";
+            //apiClient.Encoding = Encoding.UTF8;
 
+            using (WebClient client = new WebClient())
+               
+                apiresponse = client.DownloadString(url);
+
+            // Warframe warframe = JsonConvert.DeserializeObject<Warframe>(apiresponse);
+           // using Warframe;
+            var warframe = Warframe.FromJson(apiresponse);
+            var seed = warframe.WorldSeed;
+            var activeMissions = warframe.ActiveMissions; //this is a List<ActiveMission> 
+            int dacount = 0;
+            foreach (ActiveMission am in activeMissions)
+               
+            {
+                string type = activeMissions[dacount].MissionType;
+                Date activationDate = am.Activation.Date;
+                //Console.WriteLine(Utilities.GetMissions(type)); //+ " " + activeMissions[3].Node + " " + activeMissions[3].Region);
+               
+
+                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node + " " + activeMissions[dacount].Region);
+                dacount = dacount + 1;
+               
+            }
+        }
        // [Command("stats")]
        // public async Task ThierStats(IGuildUser user)
       //  {

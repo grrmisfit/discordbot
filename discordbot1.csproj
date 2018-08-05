@@ -144,6 +144,7 @@
     <Compile Include="DataStorage.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Misc.cs" />
+    <Compile Include="Modules\Warframe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -152,9 +153,8 @@
     <None Include="SystemLang\alerts.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="SystemLang\missions.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
