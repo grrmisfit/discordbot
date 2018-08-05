@@ -157,13 +157,7 @@ namespace discordbot.Modules
                
             }
         }
-       // [Command("stats")]
-       // public async Task ThierStats(IGuildUser user)
-      //  {
-         //   var account = UserAccounts.GetAccount((SocketUser)user);
-         //   await Context.Channel.SendMessageAsync($"You have {account.XP} XP and {account.Points} points");
-       // }
-
+      
        // [Command("mystats")]
        // public async Task MyStats([Remainder]string daplayer)
        // {
