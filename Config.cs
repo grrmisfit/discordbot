@@ -41,5 +41,7 @@ namespace discordbot
 
         public string token;
         public string cmdPrefix;
+        public string webtoken;
+        public string webtokenpass;
     }
 }

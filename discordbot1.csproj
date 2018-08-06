@@ -125,15 +125,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\..\OneDrive\discordbot\CommandHandler.cs">
-      <Link>CommandHandler.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\OneDrive\discordbot\Config.cs">
-      <Link>Config.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\OneDrive\discordbot\Utilities.cs">
-      <Link>Utilities.cs</Link>
-    </Compile>
+    <Compile Include="CommandHandler.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="..\..\..\..\OneDrive\discordbot\Program.cs">
       <Link>Program.cs</Link>
     </Compile>
