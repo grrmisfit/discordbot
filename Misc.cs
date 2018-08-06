@@ -181,9 +181,10 @@ namespace discordbot.Modules
 
                 Date activationDate = activeSortie[0].Activation.Date;
 
+            string bossname = Utilities.GetSortieBoss(activeSortie[0].Boss);
+            string sorttype = Utilities.GetSortieType(activeSortie[0].Variants[0].ModifierType);
 
-
-            await SendMessage(Utilities.GetSortie(activeSortie[0].Boss)); //+ " " + activeMissions[dacount].Node);
+            await SendMessage(bossname + " " + sorttype); //+ " " + activeMissions[dacount].Node);
                // dacount = dacount + 1;
 
             
