@@ -144,23 +144,50 @@ namespace discordbot.Modules
             var warframe = Warframe.Warframe.FromJson(apiresponse);
             var seed = warframe.WorldSeed;
             var activeMissions = warframe.ActiveMissions; //this is a List<ActiveMission> 
-            var theSorties = warframe.Sorties;
+           
             int dacount = 0;
             foreach (ActiveMission am in activeMissions)
                
             {
                 string type = activeMissions[dacount].MissionType;
-                string bossname = theSorties[0].Boss;
+                
                 Date activationDate = am.Activation.Date;
                 //Console.WriteLine(Utilities.GetMissions(type)); //+ " " + activeMissions[3].Node + " " + activeMissions[3].Region);
                
 
-                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node + " " + Utilities.GetSorties(bossname));
+                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node);
                 dacount = dacount + 1;
                
             }
         }
-      
+            [Command("sortie")]
+            public async Task CurSortie()
+        {
+            string url = "http://content.warframe.com/dynamic/worldState.php";
+            string apiresponse = "";
+            //api
+
+            using (WebClient client = new WebClient())
+            {
+                client.Encoding = Encoding.UTF8;
+                apiresponse = client.DownloadString(url);
+            }
+            // Warframe warframe = JsonConvert.DeserializeObject<Warframe>(apiresponse);
+            // using Warframe;
+            var warframe = Warframe.Warframe.FromJson(apiresponse);
+            var seed = warframe.WorldSeed;
+            var activeSortie = warframe.Sorties; //this is a List<Sorties> 
+            
+
+                Date activationDate = activeSortie[0].Activation.Date;
+
+
+
+            await SendMessage(Utilities.GetSortie(activeSortie[0].Boss)); //+ " " + activeMissions[dacount].Node);
+               // dacount = dacount + 1;
+
+            
+        }
        // [Command("mystats")]
        // public async Task MyStats([Remainder]string daplayer)
        // {
