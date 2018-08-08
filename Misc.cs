@@ -15,8 +15,10 @@ using Newtonsoft.Json.Linq;
 using discordbot.Core;
 using System.IO;
 
+
 namespace discordbot.Modules
 {
+    
     public class Misc : ModuleBase<SocketCommandContext>
     {
         
@@ -24,7 +26,7 @@ namespace discordbot.Modules
             {
            await Context.Channel.SendMessageAsync( msg);
             }
-
+        public string themsg;
     [Command("Kick")]
         [RequireUserPermission(GuildPermission.KickMembers)]
         [RequireBotPermission(GuildPermission.KickMembers)]
@@ -128,7 +130,7 @@ namespace discordbot.Modules
             await Context.Channel.SendMessageAsync("Data has " + DataStorage.GetPairsCount() + " pairs.");
             DataStorage.AddPairToStorage("Count" + DataStorage.GetPairsCount(), "TheCount" + DataStorage.GetPairsCount());
         }
-        [Command("missions")]
+        [Command("fissures")]
         public async Task GetMissions()
         {
             string url = "http://content.warframe.com/dynamic/worldState.php";
@@ -144,24 +146,23 @@ namespace discordbot.Modules
             var warframe = Warframe.Warframe.FromJson(apiresponse);
             var seed = warframe.WorldSeed;
             var activeMissions = warframe.ActiveMissions; //this is a List<ActiveMission> 
-           
+            
             int dacount = 0;
             foreach (ActiveMission am in activeMissions)
                
             {
-                string type = activeMissions[dacount].MissionType;
                 
-                Date activationDate = am.Activation.Date;
-                //Console.WriteLine(Utilities.GetMissions(type)); //+ " " + activeMissions[3].Node + " " + activeMissions[3].Region);
-               
+                string type = activeMissions[dacount].MissionType;
+               Date activationDate = am.Activation.Date;
 
-                await SendMessage(Utilities.GetMissions(type) + " " +  activeMissions[dacount].Node);
-                dacount = dacount + 1;
+                 themsg = themsg + Utilities.GetMissions(type) + " " + Utilities.ReplaceInfo(activeMissions[dacount].Node) + " " + Utilities.ReplaceInfo(activeMissions[dacount].Modifier) + "\n";
+             dacount = dacount + 1;
                
             }
+                await SendMessage(themsg);
         }
             [Command("sortie")]
-            public async Task CurSortie()
+            public async Task CurrentSortie()
         {
             string url = "http://content.warframe.com/dynamic/worldState.php";
             string apiresponse = "";
@@ -172,23 +173,47 @@ namespace discordbot.Modules
                 client.Encoding = Encoding.UTF8;
                 apiresponse = client.DownloadString(url);
             }
-            // Warframe warframe = JsonConvert.DeserializeObject<Warframe>(apiresponse);
-            // using Warframe;
+            
             var warframe = Warframe.Warframe.FromJson(apiresponse);
             var seed = warframe.WorldSeed;
             var activeSortie = warframe.Sorties; //this is a List<Sorties> 
-            
 
-                Date activationDate = activeSortie[0].Activation.Date;
-
+            //set the time from unix to current
+            var activationDate = activeSortie[0].Activation.Date;
+            var datime = Convert.ToInt64(activationDate.NumberLong);
+               var curtime = DateTimeOffset.FromUnixTimeMilliseconds(datime).DateTime.ToLocalTime();
+            //set variables with all the info needed. probably not the cleanest way
             string bossname = Utilities.GetSortieBoss(activeSortie[0].Boss);
-            string sorttype = Utilities.GetSortieType(activeSortie[0].Variants[0].ModifierType);
+            string firstmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[0].Node);
+            string firstmistype = Utilities.GetSortieType(activeSortie[0].Variants[0].ModifierType);
+            string firstmis = Utilities.ReplaceInfo(activeSortie[0].Variants[0].MissionType);
+            string secmistype = Utilities.ReplaceInfo(activeSortie[0].Variants[1].ModifierType);
+            string secmis = Utilities.ReplaceInfo(activeSortie[0].Variants[1].MissionType);
+            string secmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[1].Node);
+            string thirdmis = Utilities.ReplaceInfo(activeSortie[0].Variants[2].MissionType);
+            string thirdmistype = Utilities.ReplaceInfo(activeSortie[0].Variants[2].ModifierType);
+            string thirdmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[2].Node);
 
-            await SendMessage(bossname + " " + sorttype); //+ " " + activeMissions[dacount].Node);
-               // dacount = dacount + 1;
+            var embed = new EmbedBuilder();
+            embed.WithTitle("Sortie Information");
+            embed.WithDescription("Start Time: " + curtime );
+            embed.AddField("First Mission", firstmis, true);
+            embed.AddField("Modifier", firstmistype, true);
+            embed.AddField("Planet", firstmisnode, true);
+            embed.AddField("Second Mission", secmis, true);
+            embed.AddField("Modifier",secmistype, true);
+            embed.AddField("Planet", secmisnode, true);
+            embed.AddField("Third Mission", thirdmis, true);
+            embed.AddField("Modifier", thirdmistype, true);
+            embed.AddField("Planet", thirdmisnode, true);
+            embed.AddField("Final Boss", bossname, true);
+            embed.WithColor(new Color(0, 255, 0));
 
-            
-        }
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+ }
+
+     
+
        // [Command("mystats")]
        // public async Task MyStats([Remainder]string daplayer)
        // {

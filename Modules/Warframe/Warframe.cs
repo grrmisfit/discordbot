@@ -597,7 +597,7 @@ namespace discordbot.Modules.Warframe
 
     public enum FactionEnum { FcCorpus, FcGrineer, FcInfestation };
 
-    public enum Category { PvpChallengeTypeCategoryDaily, PvpChallengeTypeCategoryWeekly, PvpChallengeTypeCategoryWeeklyRoot };
+    public enum Category { PvpChallengeTypeCategoryDaily, PvpChallengeTypeCategoryWeekly, PvpChallengeTypeCategoryWeeklyRoot, PVPChallengeTypeCategory_MODEAFFECTOR};
 
     public enum N { ScriptParamValue };
 
@@ -778,8 +778,11 @@ namespace discordbot.Modules.Warframe
                     return Category.PvpChallengeTypeCategoryWeekly;
                 case "PVPChallengeTypeCategory_WEEKLY_ROOT":
                     return Category.PvpChallengeTypeCategoryWeeklyRoot;
+                case "PVPChallengeTypeCategory_MODEAFFECTOR":
+                    return Category.PVPChallengeTypeCategory_MODEAFFECTOR;
+
             }
-            throw new Exception("Cannot unmarshal type Category");
+            throw new Exception("Cannot marshal type Category");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -800,6 +803,9 @@ namespace discordbot.Modules.Warframe
                     return;
                 case Category.PvpChallengeTypeCategoryWeeklyRoot:
                     serializer.Serialize(writer, "PVPChallengeTypeCategory_WEEKLY_ROOT");
+                    return;
+                case Category.PVPChallengeTypeCategory_MODEAFFECTOR:
+                    serializer.Serialize(writer, "PVPChallengeTypeCategory_MODEAFFECTOR");
                     return;
             }
             throw new Exception("Cannot marshal type Category");
