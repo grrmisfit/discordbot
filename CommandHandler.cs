@@ -30,6 +30,7 @@ namespace discordbot
             if (msg == null) return;
             var context = new SocketCommandContext(_client, msg);
             int argPos = 0;
+            if (msg.Content.Contains("Blood moon horde is starting")) Console.WriteLine("yers");
             if(msg.HasStringPrefix(Config.bot.cmdPrefix,ref argPos)
                 || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {

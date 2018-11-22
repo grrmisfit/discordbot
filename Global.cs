@@ -13,19 +13,7 @@ namespace discordbot
         internal static DiscordSocketClient Client { get; set; }
         internal static ulong MessageIdToTrack { get; set; }
     }
-    public class SolNodeTmp
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
-    public class SortieData
-    {
-        public string Name { get; set; }
-        public string Seed { get; set; }
-        public string ModType { get; set; }
-        public string ModDesc { get; set; }
-
-    }
+    
     public class PositionOnline
     {
         public int x { get; set; }

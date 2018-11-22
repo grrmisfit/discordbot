@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
-using discordbot.Core.UserAccounts;
-using System.Net;
 using Discord.Rest;
-using Newtonsoft.Json;
-using discordbot.Modules.Warframe;
+using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
-using discordbot.Core;
-using System.IO;
 
-
-namespace discordbot.Modules
+namespace discordbot
 {
-    
+
     public class Misc : ModuleBase<SocketCommandContext>
     {
         
@@ -64,12 +57,12 @@ namespace discordbot.Modules
             var namefound = false;
             foreach (GetPlayerOnlineResult player in tempdata)
             {
-                if(player.Name == message)
+                if(player.Name.ToLower().Contains(message.ToLower()) )
                 {
                     namefound = true;
                     var embed = new EmbedBuilder();
                     embed.WithTitle("Player Information");
-                    embed.WithDescription(message);
+                    embed.WithDescription(player.Name);
                     embed.AddField("Level", Math.Floor(player.Level),true);
                     embed.AddField("Kills", player.Zombiekills, true);
                     embed.AddField("Deaths", player.Playerdeaths, true);
@@ -102,14 +95,12 @@ namespace discordbot.Modules
 
        
 
-        [Command("secret")]
+        [Command("log")]
 
-        public async Task RevealSecret([Remainder]string arg = "")
+        public async Task LogCom()
         {
-            if (!IsUserOwner((SocketGuildUser)Context.User)) return;
-            var dmChannel = await Context.User.GetOrCreateDMChannelAsync();
-            await dmChannel.SendMessageAsync(Utilities.GetAlert("SECRET"));
-
+            
+            Utilities.GetLogLine();
         }
 
         private bool IsUserOwner(SocketGuildUser user)
@@ -130,89 +121,23 @@ namespace discordbot.Modules
             await Context.Channel.SendMessageAsync("Data has " + DataStorage.GetPairsCount() + " pairs.");
             DataStorage.AddPairToStorage("Count" + DataStorage.GetPairsCount(), "TheCount" + DataStorage.GetPairsCount());
         }
-        [Command("fissures")]
-        public async Task GetMissions()
+
+        [Command("nfo")]
+        public async Task SayNfo()
         {
-            string url = "http://content.warframe.com/dynamic/worldState.php";
-            string apiresponse = "";
-            //apiClient.Encoding = Encoding.UTF8;
-
-            using (WebClient client = new WebClient())
-               
-                apiresponse = client.DownloadString(url);
-
-            // Warframe warframe = JsonConvert.DeserializeObject<Warframe>(apiresponse);
-           // using Warframe;
-            var warframe = Warframe.Warframe.FromJson(apiresponse);
-            var seed = warframe.WorldSeed;
-            var activeMissions = warframe.ActiveMissions; //this is a List<ActiveMission> 
-            
-            int dacount = 0;
-            foreach (ActiveMission am in activeMissions)
-               
-            {
-                
-                string type = activeMissions[dacount].MissionType;
-               Date activationDate = am.Activation.Date;
-
-                 themsg = themsg + Utilities.GetMissions(type) + " " + Utilities.ReplaceInfo(activeMissions[dacount].Node) + " " + Utilities.ReplaceInfo(activeMissions[dacount].Modifier) + "\n";
-             dacount = dacount + 1;
-               
-            }
-                await SendMessage(themsg);
-        }
-            [Command("sortie")]
-            public async Task CurrentSortie()
-        {
-            string url = "http://content.warframe.com/dynamic/worldState.php";
-            string apiresponse = "";
-            //api
-
-            using (WebClient client = new WebClient())
-            {
-                client.Encoding = Encoding.UTF8;
-                apiresponse = client.DownloadString(url);
-            }
-            
-            var warframe = Warframe.Warframe.FromJson(apiresponse);
-            var seed = warframe.WorldSeed;
-            var activeSortie = warframe.Sorties; //this is a List<Sorties> 
-
-            //set the time from unix to current
-            var activationDate = activeSortie[0].Activation.Date;
-            var datime = Convert.ToInt64(activationDate.NumberLong);
-               var curtime = DateTimeOffset.FromUnixTimeMilliseconds(datime).DateTime.ToLocalTime();
-            //set variables with all the info needed. probably not the cleanest way
-            string bossname = Utilities.GetSortieBoss(activeSortie[0].Boss);
-            string firstmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[0].Node);
-            string firstmistype = Utilities.GetSortieType(activeSortie[0].Variants[0].ModifierType);
-            string firstmis = Utilities.ReplaceInfo(activeSortie[0].Variants[0].MissionType);
-            string secmistype = Utilities.ReplaceInfo(activeSortie[0].Variants[1].ModifierType);
-            string secmis = Utilities.ReplaceInfo(activeSortie[0].Variants[1].MissionType);
-            string secmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[1].Node);
-            string thirdmis = Utilities.ReplaceInfo(activeSortie[0].Variants[2].MissionType);
-            string thirdmistype = Utilities.ReplaceInfo(activeSortie[0].Variants[2].ModifierType);
-            string thirdmisnode = Utilities.ReplaceInfo(activeSortie[0].Variants[2].Node);
-
             var embed = new EmbedBuilder();
-            embed.WithTitle("Sortie Information");
-            embed.WithDescription("Start Time: " + curtime );
-            embed.AddField("First Mission", firstmis, true);
-            embed.AddField("Modifier", firstmistype, true);
-            embed.AddField("Planet", firstmisnode, true);
-            embed.AddField("Second Mission", secmis, true);
-            embed.AddField("Modifier",secmistype, true);
-            embed.AddField("Planet", secmisnode, true);
-            embed.AddField("Third Mission", thirdmis, true);
-            embed.AddField("Modifier", thirdmistype, true);
-            embed.AddField("Planet", thirdmisnode, true);
-            embed.AddField("Final Boss", bossname, true);
-            embed.WithColor(new Color(0, 255, 0));
-
+            embed.WithTitle("Server Information");
+            embed.AddField("Server Ip: ", "45.58.114.154");
+            embed.AddField("Port: ", "26912");
+            embed.AddField("Notes: ", "Run with EAC on!");
             await Context.Channel.SendMessageAsync("", false, embed.Build());
- }
-
-     
+        }
+        [Command("say")]
+        public async Task SayToChat([Remainder] string msg)
+        {
+            
+            await Context.Channel.SendMessageAsync(msg);
+        }
 
        // [Command("mystats")]
        // public async Task MyStats([Remainder]string daplayer)

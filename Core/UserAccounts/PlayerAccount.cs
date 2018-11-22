@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace discordbot.Core.UserAccounts
 {
-    public partial class UserAccount
+    public class PlayerAccount
     {
         [JsonProperty("steamid")]
         public string Steamid { get; set; }
@@ -94,4 +94,5 @@ namespace discordbot.Core.UserAccounts
             },
         };
     }
+}
 }
